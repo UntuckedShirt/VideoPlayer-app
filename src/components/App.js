@@ -22,9 +22,18 @@ import VideoDetail from "./VideoDetail";
 // pass a reference to callback down to the videoList as a prop
 // make sure to double check that you are passing down a prop as video NOT videos
 // we were passing and array of obj that made sense to pass the plural
+// response.data.items[0] is used when we do a search go ahead and take
+// the first vid in result set and use as defualt video
+// we should show some defualt sdearch for loading text
+// compose a component didmount method will make a defualt search when app
+// is rednered to the screen
 
 class App extends React.Component {
     state = { videos: [], selectedVideo: null };
+
+    componentDidMount() {
+        this.onTermSubmit('fighting games')
+    }
   
     onTermSubmit = async (term) => {
       const response = await youtube.get("/search", {
@@ -33,7 +42,10 @@ class App extends React.Component {
         },
       });
   
-      this.setState({ videos: response.data.items });
+        this.setState({
+            videos: response.data.items,
+            selectedVideo: response.data.items[0]
+        });
     };
   
     onVideoSelect = (video) => {
@@ -43,12 +55,20 @@ class App extends React.Component {
     render() {
       return (
         <div className="ui container">
-          <SearchBar onFormSubmit={this.onTermSubmit} />
-          <VideoDetail video={this.state.selectedVideo} />
+              <SearchBar onFormSubmit={this.onTermSubmit} />
+              <div className="ui grid">
+                  <div className="ui row">
+                      <div className="eleven wide column">
+                          <VideoDetail video={this.state.selectedVideo} />
+                      </div>
+                      <div className="five wide column">
           <VideoList
             onVideoSelect={this.onVideoSelect}
             videos={this.state.videos}
-          />
+                          />
+                          </div>
+                    </div>
+                </div>
         </div>
       );
     }
